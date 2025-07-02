@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Editor de Mapas SVG</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto:wght@700&display=swap" rel="stylesheet">
+  <title>Cores da Geopolítica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Quantico&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Montserrat', sans-serif;
@@ -13,8 +13,14 @@
       color: #ffffff;
       text-align: center;
     }
-    h1, h2 {
-      font-family: 'Roboto', sans-serif;
+    h1 {
+      font-family: 'Quantico', sans-serif;
+      font-size: 2.5rem;
+      color: #e0d4ff;
+      margin-bottom: 2rem;
+    }
+    h2 {
+      font-family: 'Montserrat', sans-serif;
       color: #e0d4ff;
       margin-bottom: 1rem;
     }
@@ -64,7 +70,8 @@
   </style>
 </head>
 <body>
-  <h1>Editor de Mapa Político (.svg)</h1>
+  <h1>Cores da Geopolítica</h1>
+  <h2>Editor de Mapa Político (.svg)</h2>
   <p>1. Faça o upload de um arquivo <strong>.svg</strong> com mapa vetorial:</p>
   <input type="file" id="svgFile" accept=".svg">
 
@@ -86,7 +93,7 @@
   <br>
   <a id="csvDownloadLink" style="display:none;" download="municipios_extraidos.csv">Baixar CSV Gerado</a>
 
-  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Bare_sole.jpg" alt="Sola de um pé">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Brazil_location_map.svg" alt="Mapa do Brasil">
 
   <script>
     async function processFiles() {
