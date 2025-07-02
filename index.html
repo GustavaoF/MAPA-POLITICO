@@ -21,6 +21,16 @@
   <br>
   <a id="downloadLink" style="display:none;" download="mapa_editado.svg">Baixar Mapa Editado</a>
 
+  <hr>
+
+  <h2>Extrair IDs e Labels do Mapa (.svg)</h2>
+  <p>Envie um mapa político em formato <strong>.svg</strong> para gerar uma planilha:</p>
+  <input type="file" id="extractFile" accept=".svg">
+  <br>
+  <button onclick="extractData()">Extrair para CSV</button>
+  <br>
+  <a id="csvDownloadLink" style="display:none;" download="municipios_extraidos.csv">Baixar CSV Gerado</a>
+
   <script>
     async function processFiles() {
       const svgInput = document.getElementById('svgFile').files[0];
@@ -63,6 +73,35 @@
       link.href = url;
       link.style.display = "inline-block";
       link.textContent = "Baixar Mapa Editado";
+    }
+
+    async function extractData() {
+      const fileInput = document.getElementById('extractFile').files[0];
+      if (!fileInput) {
+        alert("Envie um arquivo SVG primeiro.");
+        return;
+      }
+
+      const svgText = await fileInput.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
+
+      const rows = [['cod_mun', 'nome_mun', 'cor']];
+      const elements = xmlDoc.querySelectorAll("[id]");
+      elements.forEach(el => {
+        const id = el.getAttribute("id") || "";
+        const label = el.getAttribute("label") || "";
+        rows.push([id, label, ""]);
+      });
+
+      const csvContent = rows.map(row => row.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.getElementById("csvDownloadLink");
+      link.href = url;
+      link.style.display = "inline-block";
+      link.textContent = "Baixar CSV Gerado";
     }
   </script>
 </body>
