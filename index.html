@@ -1,11 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>Editor de Mapas SVG</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    input[type=file], button { margin: 1rem 0; }
+  </style>
 </head>
 <body>
-    <div>OLA</div>
+  <h1>Editor de Mapa Político (.svg)</h1>
+  <p>1. Faça o upload de um arquivo <strong>.svg</strong> com mapa vetorial:</p>
+  <input type="file" id="svgFile" accept=".svg">
+
+  <p>2. Faça o upload de um arquivo <strong>.csv</strong> com colunas: <code>cod_mun,nome_mun,cor</code>:</p>
+  <input type="file" id="csvFile" accept=".csv">
+
+  <br>
+  <button onclick="processFiles()">Gerar novo SVG</button>
+  <br>
+  <a id="downloadLink" style="display:none;" download="mapa_editado.svg">Baixar Mapa Editado</a>
+
+  <script>
+    async function processFiles() {
+      const svgInput = document.getElementById('svgFile').files[0];
+      const csvInput = document.getElementById('csvFile').files[0];
+
+      if (!svgInput || !csvInput) {
+        alert("Por favor, envie os dois arquivos.");
+        return;
+      }
+
+      const svgText = await svgInput.text();
+      const csvText = await csvInput.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
+
+      const lines = csvText.split(/\r?\n/);
+      const map = {};
+      for (let i = 1; i < lines.length; i++) {
+        const [cod_mun, nome_mun, cor] = lines[i].split(',');
+        if (cod_mun && cor) map[cod_mun.trim()] = cor.trim();
+      }
+
+      const elements = xmlDoc.querySelectorAll("[id]");
+      elements.forEach(el => {
+        const id = el.getAttribute("id");
+        if (map[id]) {
+          let style = el.getAttribute("style") || "";
+          let styles = Object.fromEntries(style.split(';').map(s => s.split(':')).filter(p => p.length === 2));
+          styles.fill = map[id];
+          el.setAttribute("style", Object.entries(styles).map(([k, v]) => `${k}:${v}`).join(';'));
+        }
+      });
+
+      const serializer = new XMLSerializer();
+      const editedSvg = serializer.serializeToString(xmlDoc);
+      const blob = new Blob([editedSvg], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.getElementById("downloadLink");
+      link.href = url;
+      link.style.display = "inline-block";
+      link.textContent = "Baixar Mapa Editado";
+    }
+  </script>
 </body>
 </html>
