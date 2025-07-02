@@ -90,7 +90,18 @@
       const elements = xmlDoc.querySelectorAll("[id]");
       elements.forEach(el => {
         const id = el.getAttribute("id") || "";
-        const label = el.getAttribute("label") || "";
+        let label = el.getAttribute("label") || "";
+
+        // Tenta extrair "inkscape:label" se "label" não existir
+        if (!label) {
+          for (let attr of el.attributes) {
+            if (attr.name.endsWith(":label")) {
+              label = attr.value;
+              break;
+            }
+          }
+        }
+
         rows.push([id, label, ""]);
       });
 
