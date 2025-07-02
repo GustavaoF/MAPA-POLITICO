@@ -4,8 +4,44 @@
   <meta charset="UTF-8">
   <title>Editor de Mapas SVG</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    input[type=file], button { margin: 1rem 0; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: linear-gradient(135deg, #1e1e70, #5e3ca4);
+      color: #ffffff;
+    }
+    h1, h2 {
+      color: #e0d4ff;
+    }
+    input[type=file], button {
+      margin: 1rem 0;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #6a4fc7;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #5a3db1;
+    }
+    a {
+      color: #ffdbfa;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+    hr {
+      border-color: #a177ff;
+    }
+    img {
+      margin-top: 3rem;
+      max-width: 300px;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -30,6 +66,8 @@
   <button onclick="extractData()">Extrair para CSV</button>
   <br>
   <a id="csvDownloadLink" style="display:none;" download="municipios_extraidos.csv">Baixar CSV Gerado</a>
+
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Bare_sole.jpg" alt="Sola de um pé">
 
   <script>
     async function processFiles() {
@@ -92,7 +130,6 @@
         const id = el.getAttribute("id") || "";
         let label = el.getAttribute("label") || "";
 
-        // Tenta extrair "inkscape:label" se "label" não existir
         if (!label) {
           for (let attr of el.attributes) {
             if (attr.name.endsWith(":label")) {
