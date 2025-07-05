@@ -47,7 +47,7 @@
       font-size: 14px;
     }
     .map-frame {
-      width: 575px;
+      width: 100%;
       height: 475px;
       background-color: #e9ecef;
       border-radius: 8px;
@@ -60,7 +60,6 @@
     .map-frame svg {
       width: 100%;
       height: 100%;
-      object-fit: contain;
       display: block;
     }
     .right-panel {
@@ -154,11 +153,11 @@
         svg.setAttribute('viewBox', '0 0 575 475');
         svg.removeAttribute('width');
         svg.removeAttribute('height');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
         svg.style.display = 'block';
         svg.style.width = '100%';
         svg.style.height = '100%';
         svg.style.margin = '0 auto';
-        svg.style.objectFit = 'contain';
       }
     }
   </script>
