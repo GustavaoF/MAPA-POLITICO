@@ -80,12 +80,12 @@
 <body>
   <h1>Cores da Geopolítica</h1>
   <h2>Editor de Mapa Político (.svg)</h2>
-  <p>1. Faça o upload de um arquivo <strong>.svg</strong> com mapa vetorial:</p>
+  <p>Etapa I - Faça o upload de um arquivo <strong>.svg</strong> com mapa vetorial:</p>
   <input type="file" id="svgFile" accept=".svg" onchange="previewOriginalSvg()">
 
   <div id="originalSvgPreview"></div>
 
-  <p>2. Faça o upload de um arquivo <strong>.csv</strong> com colunas: <code>cod_mun,nome_mun,cor</code>:</p>
+  <p>Etapa II - Faça o upload de um arquivo <strong>.csv</strong> com colunas: <code>cod_mun,nome_mun,cor</code>:</p>
   <input type="file" id="csvFile" accept=".csv">
 
   <br>
@@ -97,7 +97,7 @@
 
   <hr>
 
-  <h2>Extrair IDs e Labels do Mapa (.svg)</h2>
+  <h2>Extrair planilha a partir de um Mapa Político (.svg)</h2>
   <p>Envie um mapa político em formato <strong>.svg</strong> para gerar uma planilha:</p>
   <input type="file" id="extractFile" accept=".svg" onchange="previewExtractedSvg()">
   <br>
