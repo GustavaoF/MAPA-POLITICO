@@ -181,45 +181,6 @@
       const elements = xmlDoc.querySelectorAll("[id]");
       elements.forEach(el => {
         const id = el.getAttribute("id") || "";
-
-        let label = el.getAttribute("label") || "";
-        if (!label) {
-          for (let attr of el.attributes) {
-            if (attr.name.endsWith(":label")) {
-              label = attr.value;
-              break;
-            }
-          }
-        }
-
-        let fill = "";
-        const styleAttr = el.getAttribute("style") || "";
-        const styles = Object.fromEntries(styleAttr.split(';').map(s => s.split(':')).filter(p => p.length === 2));
-        if (styles.fill) {
-          fill = styles.fill.trim();
-        }
-
-        rows.push([id, label, fill]);
-      });
-
-      const csvContent = rows.map(row => row.join(",")).join("n/");
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-
-      const link = document.getElementById("csvDownloadLink");
-      link.href = url;
-      link.style.display = "inline-block";
-      link.textContent = "Baixar CSV Gerado";
-      }
-
-      const svgText = await fileInput.text();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
-
-      const rows = [['cod_mun', 'nome_mun', 'cor']];
-      const elements = xmlDoc.querySelectorAll("[id]");
-      elements.forEach(el => {
-        const id = el.getAttribute("id") || "";
         let label = el.getAttribute("label") || "";
 
         if (!label) {
@@ -242,7 +203,7 @@
       link.href = url;
       link.style.display = "inline-block";
       link.textContent = "Baixar CSV Gerado";
-      
+    }
   </script>
 </body>
 </html>
