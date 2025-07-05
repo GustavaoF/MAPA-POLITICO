@@ -150,11 +150,12 @@
 
       const svg = container.querySelector('svg');
       if (svg) {
-        svg.setAttribute('viewBox', '0 0 575 475');
         svg.removeAttribute('width');
         svg.removeAttribute('height');
         svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
         svg.style.display = 'block';
+        svg.style.x = '25';
+        svg.style.y = '100%';
         svg.style.width = '100%';
         svg.style.height = '100%';
         svg.style.margin = '0 auto';
