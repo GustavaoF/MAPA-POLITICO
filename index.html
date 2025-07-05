@@ -67,13 +67,13 @@
       margin-left: auto;
       margin-right: auto;
     }
-    #originalSvgPreview, #editedSvgPreview {
+    #originalSvgPreview, #editedSvgPreview, #extractedSvgPreview {
       margin: 2rem auto;
       background: #fff;
       border-radius: 10px;
       padding: 1rem;
-      width: 90%;
-      max-width: 800px;
+      width: 95%;
+      max-width: 1200px;
     }
   </style>
 </head>
@@ -99,11 +99,13 @@
 
   <h2>Extrair IDs e Labels do Mapa (.svg)</h2>
   <p>Envie um mapa político em formato <strong>.svg</strong> para gerar uma planilha:</p>
-  <input type="file" id="extractFile" accept=".svg">
+  <input type="file" id="extractFile" accept=".svg" onchange="previewExtractedSvg()">
   <br>
   <button onclick="extractData()">Extrair para CSV</button>
   <br>
   <a id="csvDownloadLink" style="display:none;" download="municipios_extraidos.csv">Baixar CSV Gerado</a>
+
+  <div id="extractedSvgPreview"></div>
 
   <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Brazil_location_map.svg" alt="Mapa do Brasil">
 
@@ -114,6 +116,14 @@
       const svgText = await fileInput.text();
       const container = document.getElementById('originalSvgPreview');
       container.innerHTML = '<h2>Mapa Original</h2>' + svgText;
+    }
+
+    async function previewExtractedSvg() {
+      const fileInput = document.getElementById('extractFile').files[0];
+      if (!fileInput) return;
+      const svgText = await fileInput.text();
+      const container = document.getElementById('extractedSvgPreview');
+      container.innerHTML = '<h2>Visualização do Mapa Importado</h2>' + svgText;
     }
 
     async function processFiles() {
@@ -216,5 +226,6 @@
   </script>
 </body>
 </html>
+
 
 
