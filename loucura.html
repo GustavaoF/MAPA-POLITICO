@@ -47,38 +47,21 @@
       font-size: 14px;
     }
     .map-frame {
-      width: 100%;
-      height: 500px;
+      width: 575px;
+      height: 475px;
       background-color: #e9ecef;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #6c757d;
-      font-size: 18px;
-      font-weight: 500;
       overflow: hidden;
-      position: relative;
-    }
-    .map-frame svg {
-      width: 575px;
-      height: 475px;
-      display: block;
       margin: 0 auto;
     }
-    .map-placeholder-box {
-      position: absolute;
-      width: 575px;
-      height: 475px;
-      background-color: rgba(0, 128, 0, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #003300;
-      font-weight: bold;
-      border: 2px dashed #006600;
-      pointer-events: none;
-      z-index: 1;
+    .map-frame svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
     .right-panel {
       width: 30%;
@@ -141,9 +124,6 @@
         <input type="file" id="svgFile" accept=".svg" onchange="loadSvg()">
       </div>
       <div class="map-frame" id="mapFrame">
-        <div class="map-placeholder-box">
-          Caixa de referência: 575x475px
-        </div>
         Mapa Eleitoral (vazio)
       </div>
     </div>
@@ -167,19 +147,22 @@
 
       const text = await file.text();
       const container = document.getElementById('mapFrame');
-      container.innerHTML = '<div class="map-placeholder-box">Caixa de referência: 575x475px</div>' + text;
+      container.innerHTML = text;
 
       const svg = container.querySelector('svg');
       if (svg) {
+        svg.setAttribute('viewBox', '0 0 575 475');
         svg.removeAttribute('width');
         svg.removeAttribute('height');
-        svg.setAttribute('width', '575');
-        svg.setAttribute('height', '475');
         svg.style.display = 'block';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
         svg.style.margin = '0 auto';
+        svg.style.objectFit = 'contain';
       }
     }
   </script>
 </body>
 </html>
+
 
