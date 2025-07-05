@@ -14,6 +14,17 @@
     body {
       background-color: #f8f9fa;
       padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: 28px;
+      color: #b30000;
+      font-weight: 600;
+    }
+    .container {
       display: flex;
       gap: 20px;
     }
@@ -29,7 +40,7 @@
       gap: 10px;
       margin-bottom: 20px;
     }
-    .controls select, .controls input {
+    .controls select, .controls input, .controls label {
       padding: 8px;
       border-radius: 4px;
       border: 1px solid #ccc;
@@ -46,6 +57,28 @@
       color: #6c757d;
       font-size: 18px;
       font-weight: 500;
+      overflow: hidden;
+      position: relative;
+    }
+    .map-frame svg {
+      width: 575px;
+      height: 475px;
+      display: block;
+      margin: 0 auto;
+    }
+    .map-placeholder-box {
+      position: absolute;
+      width: 575px;
+      height: 475px;
+      background-color: rgba(0, 128, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #003300;
+      font-weight: bold;
+      border: 2px dashed #006600;
+      pointer-events: none;
+      z-index: 1;
     }
     .right-panel {
       width: 30%;
@@ -90,30 +123,64 @@
   </style>
 </head>
 <body>
-  <div class="left-panel">
-    <div class="controls">
-      <select>
-        <option selected>Estado</option>
-        <option>Acre</option>
-      </select>
-      <input type="text" placeholder="Busque pelo município">
-      <select>
-        <option selected>1º Turno</option>
-      </select>
+  <header>
+    <h1>Análise Eleitoral Brasil</h1>
+  </header>
+
+  <div class="container">
+    <div class="left-panel">
+      <div class="controls">
+        <select>
+          <option selected>Estado</option>
+          <option>Acre</option>
+        </select>
+        <input type="text" placeholder="Busque pelo município">
+        <select>
+          <option selected>1º Turno</option>
+        </select>
+        <input type="file" id="svgFile" accept=".svg" onchange="loadSvg()">
+      </div>
+      <div class="map-frame" id="mapFrame">
+        <div class="map-placeholder-box">
+          Caixa de referência: 575x475px
+        </div>
+        Mapa Eleitoral (vazio)
+      </div>
     </div>
-    <div class="map-frame">
-      Mapa Eleitoral (vazio)
+    <div class="right-panel">
+      <div class="apuracao">
+        <h2>Seções apuradas</h2>
+        <div class="percentual">100,00%</div>
+      </div>
+      <div class="candidatos">
+        <h3>CANDIDATOS</h3>
+        <!-- Espaço reservado para candidatos -->
+      </div>
     </div>
   </div>
-  <div class="right-panel">
-    <div class="apuracao">
-      <h2>Seções apuradas</h2>
-      <div class="percentual">100,00%</div>
-    </div>
-    <div class="candidatos">
-      <h3>CANDIDATOS</h3>
-      <!-- Espaço reservado para candidatos -->
-    </div>
-  </div>
+
+  <script>
+    async function loadSvg() {
+      const input = document.getElementById('svgFile');
+      const file = input.files[0];
+      if (!file) return;
+
+      const text = await file.text();
+      const container = document.getElementById('mapFrame');
+      container.innerHTML = '<div class="map-placeholder-box">Caixa de referência: 575x475px</div>' + text;
+
+      const svg = container.querySelector('svg');
+      if (svg) {
+        svg.removeAttribute('width');
+        svg.removeAttribute('height');
+        svg.setAttribute('x', '575');
+        svg.setAttribute('y', '475');
+        svg.setAttribute('width', '575');
+        svg.setAttribute('height', '475');
+        svg.style.display = 'block';
+        svg.style.margin = '0 auto';
+      }
+    }
+  </script>
 </body>
 </html>
