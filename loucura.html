@@ -26,11 +26,10 @@
     }
     .container {
       display: flex;
-      gap: 50px;
-      justify-content: center;
+      gap: 20px;
     }
     .left-panel {
-      width: 50%;
+      width: 70%;
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
@@ -39,7 +38,7 @@
     .controls {
       display: flex;
       gap: 10px;
-      margin-bottom: 20px;flex-wrap: wrap;
+      margin-bottom: 20px;
     }
     .controls select, .controls input, .controls label {
       padding: 8px;
@@ -49,7 +48,7 @@
     }
     .map-frame {
       width: 100%;
-      height: 700px;
+      height: 500px;
       background-color: #e9ecef;
       border-radius: 8px;
       display: flex;
@@ -60,7 +59,6 @@
       font-weight: 500;
       overflow: hidden;
       position: relative;
-      flex-wrap: wrap;
     }
     .map-frame svg {
       width: 575px;
@@ -69,10 +67,9 @@
       margin: 0 auto;
     }
     .map-placeholder-box {
-      position: relative;
-      width: 805px;
-      height: 605px;
-      margin: 25px;
+      position: absolute;
+      width: 575px;
+      height: 475px;
       background-color: rgba(0, 128, 0, 0.3);
       display: flex;
       align-items: center;
@@ -147,6 +144,7 @@
         <div class="map-placeholder-box">
           Caixa de referência: 575x475px
         </div>
+        Mapa Eleitoral (vazio)
       </div>
     </div>
     <div class="right-panel">
@@ -175,8 +173,8 @@
       if (svg) {
         svg.removeAttribute('width');
         svg.removeAttribute('height');
-        svg.setAttribute('x', '575');
-        svg.setAttribute('y', '475');
+        svg.setAttribute('width', '575');
+        svg.setAttribute('height', '475');
         svg.style.display = 'block';
         svg.style.margin = '0 auto';
       }
@@ -184,3 +182,4 @@
   </script>
 </body>
 </html>
+
