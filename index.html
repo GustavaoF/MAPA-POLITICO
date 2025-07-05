@@ -62,7 +62,7 @@
     }
     img {
       margin-top: 3rem;
-      max-width: 90px;
+      max-width: 300px;
       display: block;
       margin-left: auto;
       margin-right: auto;
@@ -70,11 +70,8 @@
     #originalSvgPreview, #editedSvgPreview {
       margin: 2rem auto;
       background: #fff;
-      border-radius: 46px;
-      padding-top: 0.2rem;
-      padding-right: 0rem;
-      padding-bottom: 1rem;
-      padding-left: 0rem;
+      border-radius: 10px;
+      padding: 1rem;
       width: 90%;
       max-width: 800px;
     }
@@ -108,13 +105,12 @@
   <br>
   <a id="csvDownloadLink" style="display:none;" download="municipios_extraidos.csv">Baixar CSV Gerado</a>
 
-  <img src="https://cdn-icons-png.flaticon.com/512/6749/6749576.png" alt="Icone">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Brazil_location_map.svg" alt="Mapa do Brasil">
 
   <script>
     async function previewOriginalSvg() {
       const fileInput = document.getElementById('svgFile').files[0];
       if (!fileInput) return;
-
       const svgText = await fileInput.text();
       const container = document.getElementById('originalSvgPreview');
       container.innerHTML = '<h2>Mapa Original</h2>' + svgText;
@@ -167,7 +163,7 @@
     }
 
     async function extractData() {
-      const fileInput = document.getElementById('extractFile').files[0];
+      const fileInput = document.getElementById("extractFile").files[0];
       if (!fileInput) {
         alert("Envie um arquivo SVG primeiro.");
         return;
@@ -177,12 +173,12 @@
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
 
-      const rows = [['cod_mun', 'nome_mun', 'cor']];
+      const rows = [["cod_mun", "nome_mun", "cor"]];
       const elements = xmlDoc.querySelectorAll("[id]");
       elements.forEach(el => {
         const id = el.getAttribute("id") || "";
-        let label = el.getAttribute("label") || "";
 
+        let label = el.getAttribute("label") || "";
         if (!label) {
           for (let attr of el.attributes) {
             if (attr.name.endsWith(":label")) {
@@ -192,7 +188,20 @@
           }
         }
 
-        rows.push([id, label, ""]);
+        let fill = "";
+        const styleAttr = el.getAttribute("style");
+        if (styleAttr) {
+          const styleParts = styleAttr.split(';');
+          for (let part of styleParts) {
+            const [prop, val] = part.split(':').map(p => p.trim());
+            if (prop === 'fill') {
+              fill = val;
+              break;
+            }
+          }
+        }
+
+        rows.push([id, label, fill]);
       });
 
       const csvContent = rows.map(row => row.join(",")).join("\n");
@@ -207,4 +216,5 @@
   </script>
 </body>
 </html>
+
 
