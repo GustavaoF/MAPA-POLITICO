@@ -1,13 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>Resultado Eleitoral - Acre</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+    }
+    .left-panel {
+      width: 70%;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .controls select, .controls input {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .map-frame {
+      width: 100%;
+      height: 500px;
+      background-color: #e9ecef;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .right-panel {
+      width: 30%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .apuracao {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .apuracao h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 8px;
+    }
+    .apuracao .percentual {
+      background-color: #b30000;
+      color: #fff;
+      padding: 10px;
+      font-size: 20px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .candidatos {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      flex-grow: 1;
+    }
+    .candidatos h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-    <div>
-        <h1>QUIMICA AAAAJASNAjasjas</h1>
+  <div class="left-panel">
+    <div class="controls">
+      <select>
+        <option selected>Estado</option>
+        <option>Acre</option>
+      </select>
+      <input type="text" placeholder="Busque pelo município">
+      <select>
+        <option selected>1º Turno</option>
+      </select>
     </div>
+    <div class="map-frame">
+      Mapa Eleitoral (vazio)
+    </div>
+  </div>
+  <div class="right-panel">
+    <div class="apuracao">
+      <h2>Seções apuradas</h2>
+      <div class="percentual">100,00%</div>
+    </div>
+    <div class="candidatos">
+      <h3>CANDIDATOS</h3>
+      <!-- Espaço reservado para candidatos -->
+    </div>
+  </div>
 </body>
 </html>
