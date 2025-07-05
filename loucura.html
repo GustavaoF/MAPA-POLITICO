@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -14,6 +14,9 @@
     body {
       background-color: #f8f9fa;
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     header {
       text-align: center;
@@ -28,6 +31,7 @@
       display: flex;
       gap: 50px;
       width: 1250px;
+      justify-content: center;
     }
     .left-panel {
       width: 70%;
@@ -64,6 +68,7 @@
       height: 100%;
       display: block;
       padding: 15px;
+      transition: transform 0.3s ease;
     }
     .right-panel {
       width: 30%;
@@ -104,6 +109,13 @@
       font-weight: 600;
       margin-bottom: 10px;
       color: #333;
+    }
+    .map-region {
+      cursor: pointer;
+      transition: fill 0.2s ease;
+    }
+    .map-region:hover {
+      fill: #f0f0f0 !important;
     }
   </style>
 </head>
@@ -167,6 +179,18 @@
         svg.style.width = '100%';
         svg.style.height = '100%';
         svg.style.margin = '0 auto';
+
+        const regions = svg.querySelectorAll('path, polygon, rect');
+        regions.forEach(region => {
+          region.classList.add('map-region');
+          region.addEventListener('click', () => {
+            const bbox = region.getBBox();
+            const scale = 2;
+            const x = bbox.x + bbox.width / 2;
+            const y = bbox.y + bbox.height / 2;
+            svg.setAttribute('viewBox', `${x - bbox.width/scale} ${y - bbox.height/scale} ${bbox.width * 2} ${bbox.height * 2}`);
+          });
+        });
       }
     }
   </script>
