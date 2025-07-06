@@ -205,6 +205,7 @@
         document.getElementById('resetZoom').addEventListener('click', () => {
           if (svg) {
             const bbox = svg.getBBox();
+            currentViewBox = [0, 0, bbox.width, bbox.height];
             svg.setAttribute('viewBox', `0 0 ${bbox.width} ${bbox.height}`);
           }
         });
@@ -267,5 +268,6 @@
   </script>
 </body>
 </html>
+
 
 
