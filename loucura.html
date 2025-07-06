@@ -63,12 +63,28 @@
       overflow: hidden;
       margin: 0 auto;
     }
+    .map-placeholder {
+      color: #999;
+      font-size: 18px;
+    }
     .map-frame svg {
       width: 100%;
       height: 100%;
       display: block;
       padding: 15px;
       transition: transform 0.3s ease;
+    }
+    .reset-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #fff;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 5px 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
     }
     .right-panel {
       width: 30%;
@@ -138,7 +154,8 @@
         <input type="file" id="svgFile" accept=".svg" onchange="loadSvg()">
       </div>
       <div class="map-frame" id="mapFrame">
-        Mapa Eleitoral (vazio)
+        <div class="map-placeholder" id="mapPlaceholder">Insira o mapa eleitoral</div>
+        <button class="reset-button" onclick="resetZoom()">🏠</button>
       </div>
     </div>
     <div class="right-panel">
@@ -191,6 +208,14 @@
             svg.setAttribute('viewBox', `${x - bbox.width/scale} ${y - bbox.height/scale} ${bbox.width * 2} ${bbox.height * 2}`);
           });
         });
+      }
+    }
+    
+    function resetZoom() {
+      const svg = document.querySelector("#mapFrame svg");
+      if (svg) {
+        svg.setAttribute("viewBox", svg.dataset.originalViewBox || "0 0 1000 1000");
+        selected = false;
       }
     }
   </script>
