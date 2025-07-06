@@ -39,6 +39,7 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
       padding: 20px;
+      position: relative;
     }
     .controls {
       display: flex;
@@ -62,6 +63,7 @@
       justify-content: center;
       overflow: hidden;
       margin: 0 auto;
+      position: relative;
     }
     .map-frame svg {
       width: 100%;
@@ -138,7 +140,7 @@
         <input type="file" id="svgFile" accept=".svg" onchange="loadSvg()">
       </div>
       <div class="map-frame" id="mapFrame">
-        Mapa Eleitoral (vazio)
+        Insira um mapa eleitoral
       </div>
     </div>
     <div class="right-panel">
@@ -154,6 +156,16 @@
   </div>
 
   <script>
+
+    let originalViewBox = null;
+
+    function resetZoom() {
+      const svg = document.querySelector('#mapFrame svg');
+      if (svg && originalViewBox) {
+        svg.setAttribute('viewBox', originalViewBox);
+      }
+    }
+
     async function loadSvg() {
       const input = document.getElementById('svgFile');
       const file = input.files[0];
@@ -161,7 +173,9 @@
 
       const text = await file.text();
       const container = document.getElementById('mapFrame');
-      container.innerHTML = text;
+      container.innerHTML = text + container.innerHTML;
+      const texto = document.getElementById('mapaTexto');
+      if (texto) texto.remove();
 
       const svg = container.querySelector('svg');
       if (svg) {
@@ -169,12 +183,12 @@
         svg.removeAttribute('height');
         svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-        const viewBox = svg.getAttribute('viewBox');
-        if (!viewBox) {
+        if (!svg.getAttribute('viewBox')) {
           const bbox = svg.getBBox();
           svg.setAttribute('viewBox', `0 0 ${bbox.width} ${bbox.height}`);
         }
 
+        originalViewBox = svg.getAttribute('viewBox');
         svg.style.display = 'block';
         svg.style.width = '100%';
         svg.style.height = '100%';
@@ -182,16 +196,41 @@
 
         const regions = svg.querySelectorAll('path, polygon, rect');
         regions.forEach(region => {
-          region.classList.add('map-region');
+          const originalColor = region.getAttribute('fill') || '#ccc';
+          region.dataset.originalFill = originalColor;
+
+          region.addEventListener('mouseover', (e) => {
+            if (e.target === region) {
+              region.style.fill = lightenColor(originalColor, 0.4);
+            }
+          });
+
+          region.addEventListener('mouseout', (e) => {
+            if (e.target === region) {
+              region.style.fill = originalColor;
+            }
+          });
+
           region.addEventListener('click', () => {
             const bbox = region.getBBox();
-            const scale = 2;
+            const scale = 1.4;
             const x = bbox.x + bbox.width / 2;
             const y = bbox.y + bbox.height / 2;
-            svg.setAttribute('viewBox', `${x - bbox.width/scale} ${y - bbox.height/scale} ${bbox.width * 2} ${bbox.height * 2}`);
+            svg.setAttribute('viewBox', `${x - bbox.width/scale} ${y - bbox.height/scale} ${bbox.width * scale} ${bbox.height * scale}`);
           });
         });
       }
+    }
+  
+    function lightenColor(hex, factor) {
+      const num = parseInt(hex.replace('#',''), 16);
+      let r = (num >> 16) + Math.round((255 - (num >> 16)) * factor);
+      let g = ((num >> 8) & 0x00FF) + Math.round((255 - ((num >> 8) & 0x00FF)) * factor);
+      let b = (num & 0x0000FF) + Math.round((255 - (num & 0x0000FF)) * factor);
+      r = Math.min(255, r);
+      g = Math.min(255, g);
+      b = Math.min(255, b);
+      return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
     }
   </script>
 </body>
