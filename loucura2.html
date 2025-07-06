@@ -186,7 +186,7 @@
           svg.style.height = '100%';
           svg.style.margin = '0 auto';
 
-          // Popula lista de busca com labels do SVG
+          // Popula lista de busca com labels do SVG e escuta seleção para zoom
           populateSearchList(svg);
 
           const regions = svg.querySelectorAll('path, polygon, rect');
@@ -215,23 +215,36 @@
       }
     });
 
-    // Função que extrai labels do SVG e cria datalist para o input de busca
+    // Zoom para label selecionada
+    function zoomToLabel(svg, labelValue) {
+      if (!svg || !labelValue) return;
+      const selector = `[label="${labelValue}"], [inkscape\\:label="${labelValue}"]`;
+      const element = svg.querySelector(selector);
+      if (!element) return;
+
+      const bbox = element.getBBox();
+      const scale = 1.05;
+      const x = bbox.x + bbox.width / 2;
+      const y = bbox.y + bbox.height / 2;
+      const viewWidth = bbox.width * scale;
+      const viewHeight = bbox.height * scale;
+      currentViewBox = [x - viewWidth / 2, y - viewHeight / 2, viewWidth, viewHeight];
+      svg.setAttribute('viewBox', `${currentViewBox.join(' ')}`);
+    }
+
+    // Popula datalist com labels e adiciona listener para zoom ao selecionar
     function populateSearchList(svg) {
       const inputSearch = document.querySelector('.controls input[type="text"]');
       if (!inputSearch) return;
 
-      // Remove datalist antigo se existir
       const oldDatalist = document.getElementById('municipiosList');
       if (oldDatalist) oldDatalist.remove();
 
-      // Criar datalist
       const datalist = document.createElement('datalist');
       datalist.id = 'municipiosList';
 
-      // Buscar todos os elementos vetoriais que podem conter labels
       const elements = svg.querySelectorAll('path, polygon, rect, circle, ellipse, polyline');
 
-      // Extrair labels e inkscape:label
       const labelsSet = new Set();
       elements.forEach(el => {
         const label = el.getAttribute('label');
@@ -240,18 +253,20 @@
         if (inkscapeLabel) labelsSet.add(inkscapeLabel);
       });
 
-      // Ordenar e adicionar as opções no datalist
       Array.from(labelsSet).sort().forEach(label => {
         const option = document.createElement('option');
         option.value = label;
         datalist.appendChild(option);
       });
 
-      // Inserir datalist no DOM após o input
       inputSearch.after(datalist);
-
-      // Associar datalist ao input
       inputSearch.setAttribute('list', 'municipiosList');
+
+      inputSearch.addEventListener('input', () => {
+        const val = inputSearch.value.trim();
+        if (val === '') return;
+        zoomToLabel(svg, val);
+      });
     }
 
     let currentViewBox = null;
@@ -310,6 +325,7 @@
   </script>
 </body>
 </html>
+
 
 
 
