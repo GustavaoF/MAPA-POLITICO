@@ -167,6 +167,11 @@
   </div>
 
   <script>
+    let currentViewBox = null;
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let viewBoxStart = { x: 0, y: 0, width: 0, height: 0 };
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('svgFile').addEventListener('change', loadSvg);
 
@@ -198,7 +203,8 @@
           svg.style.margin = '0 auto';
 
           populateSearchList(svg);
-          attachHoverListeners(svg); // 👈 ativa exibição de labels ao passar o mouse
+          attachHoverListeners(svg);
+          handleWheelZoom(svg); // 👈 ativa zoom com rolagem
 
           const regions = svg.querySelectorAll('path, polygon, rect');
           regions.forEach(region => {
@@ -225,22 +231,6 @@
         });
       }
     });
-
-    function zoomToLabel(svg, labelValue) {
-      if (!svg || !labelValue) return;
-      const selector = `[label="${labelValue}"], [inkscape\\:label="${labelValue}"]`;
-      const element = svg.querySelector(selector);
-      if (!element) return;
-
-      const bbox = element.getBBox();
-      const scale = 1.05;
-      const x = bbox.x + bbox.width / 2;
-      const y = bbox.y + bbox.height / 2;
-      const viewWidth = bbox.width * scale;
-      const viewHeight = bbox.height * scale;
-      currentViewBox = [x - viewWidth / 2, y - viewHeight / 2, viewWidth, viewHeight];
-      svg.setAttribute('viewBox', `${currentViewBox.join(' ')}`);
-    }
 
     function populateSearchList(svg) {
       const inputSearch = document.querySelector('.controls input[type="text"]');
@@ -278,6 +268,22 @@
       });
     }
 
+    function zoomToLabel(svg, labelValue) {
+      if (!svg || !labelValue) return;
+      const selector = `[label="${labelValue}"], [inkscape\\:label="${labelValue}"]`;
+      const element = svg.querySelector(selector);
+      if (!element) return;
+
+      const bbox = element.getBBox();
+      const scale = 1.05;
+      const x = bbox.x + bbox.width / 2;
+      const y = bbox.y + bbox.height / 2;
+      const viewWidth = bbox.width * scale;
+      const viewHeight = bbox.height * scale;
+      currentViewBox = [x - viewWidth / 2, y - viewHeight / 2, viewWidth, viewHeight];
+      svg.setAttribute('viewBox', `${currentViewBox.join(' ')}`);
+    }
+
     function attachHoverListeners(svg) {
       const hoverDisplay = document.getElementById('hoverLabel');
       const regions = svg.querySelectorAll('path, polygon, rect, circle, ellipse, polyline');
@@ -293,10 +299,33 @@
       });
     }
 
-    let currentViewBox = null;
-    let isDragging = false;
-    let dragStart = { x: 0, y: 0 };
-    let viewBoxStart = { x: 0, y: 0, width: 0, height: 0 };
+    function handleWheelZoom(svg) {
+      svg.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        if (!currentViewBox) return;
+
+        const delta = event.deltaY;
+        const zoomFactor = 1.1;
+
+        const rect = svg.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        const svgX = (mouseX / svg.clientWidth) * currentViewBox[2] + currentViewBox[0];
+        const svgY = (mouseY / svg.clientHeight) * currentViewBox[3] + currentViewBox[1];
+
+        const [x, y, width, height] = currentViewBox;
+        const scale = delta > 0 ? zoomFactor : 1 / zoomFactor;
+
+        const newWidth = width * scale;
+        const newHeight = height * scale;
+        const newX = svgX - ((svgX - x) * scale);
+        const newY = svgY - ((svgY - y) * scale);
+
+        currentViewBox = [newX, newY, newWidth, newHeight];
+        svg.setAttribute('viewBox', `${newX} ${newY} ${newWidth} ${newHeight}`);
+      });
+    }
 
     function updateViewBox(svg, dx = 0, dy = 0, scale = 1) {
       const [x, y, width, height] = currentViewBox;
@@ -349,6 +378,7 @@
   </script>
 </body>
 </html>
+
 
 
 
