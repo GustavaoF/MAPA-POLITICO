@@ -39,6 +39,9 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     .controls {
       display: flex;
@@ -70,6 +73,13 @@
       display: block;
       padding: 15px;
       transition: transform 0.3s ease;
+    }
+    .hover-label {
+      text-align: center;
+      font-size: 16px;
+      color: #555;
+      font-weight: 500;
+      height: 24px;
     }
     .right-panel {
       width: 30%;
@@ -143,6 +153,7 @@
         <button id="zoomOut" style="position:absolute; bottom:10px; right:10px; z-index:10; background:#fff; border:1px solid #ccc; border-radius:50%; width:40px; height:40px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 0 5px rgba(0,0,0,0.2);">－</button>
         Mapa Eleitoral (vazio)
       </div>
+      <div class="hover-label" id="hoverLabel"></div>
     </div>
     <div class="right-panel">
       <div class="apuracao">
@@ -186,8 +197,8 @@
           svg.style.height = '100%';
           svg.style.margin = '0 auto';
 
-          // Popula lista de busca com labels do SVG e escuta seleção para zoom
           populateSearchList(svg);
+          attachHoverListeners(svg); // 👈 ativa exibição de labels ao passar o mouse
 
           const regions = svg.querySelectorAll('path, polygon, rect');
           regions.forEach(region => {
@@ -215,7 +226,6 @@
       }
     });
 
-    // Zoom para label selecionada
     function zoomToLabel(svg, labelValue) {
       if (!svg || !labelValue) return;
       const selector = `[label="${labelValue}"], [inkscape\\:label="${labelValue}"]`;
@@ -232,7 +242,6 @@
       svg.setAttribute('viewBox', `${currentViewBox.join(' ')}`);
     }
 
-    // Popula datalist com labels e adiciona listener para zoom ao selecionar
     function populateSearchList(svg) {
       const inputSearch = document.querySelector('.controls input[type="text"]');
       if (!inputSearch) return;
@@ -266,6 +275,21 @@
         const val = inputSearch.value.trim();
         if (val === '') return;
         zoomToLabel(svg, val);
+      });
+    }
+
+    function attachHoverListeners(svg) {
+      const hoverDisplay = document.getElementById('hoverLabel');
+      const regions = svg.querySelectorAll('path, polygon, rect, circle, ellipse, polyline');
+
+      regions.forEach(region => {
+        region.addEventListener('mouseenter', () => {
+          const label = region.getAttribute('label') || region.getAttribute('inkscape:label') || '';
+          hoverDisplay.textContent = label;
+        });
+        region.addEventListener('mouseleave', () => {
+          hoverDisplay.textContent = '';
+        });
       });
     }
 
@@ -325,6 +349,7 @@
   </script>
 </body>
 </html>
+
 
 
 
