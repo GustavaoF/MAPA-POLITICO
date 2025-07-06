@@ -72,6 +72,21 @@
       padding: 15px;
       transition: transform 0.3s ease;
     }
+    .reset-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .right-panel {
       width: 30%;
       display: flex;
@@ -116,9 +131,6 @@
       cursor: pointer;
       transition: fill 0.2s ease;
     }
-    .map-region:hover {
-      fill: #f0f0f0 !important;
-    }
   </style>
 </head>
 <body>
@@ -133,14 +145,15 @@
           <option selected>Estado</option>
           <option>Acre</option>
         </select>
-        <input type="text" placeholder="Busque pelo município">
+        <input type="text" id="searchBox" placeholder="Busque pelo município">
         <select>
           <option selected>1º Turno</option>
         </select>
         <input type="file" id="svgFile" accept=".svg" onchange="loadSvg()">
       </div>
       <div class="map-frame" id="mapFrame">
-        Insira um mapa eleitoral
+        <span id="mapaTexto">Insira o mapa eleitoral</span>
+        <button class="reset-button" onclick="resetZoom()">🏠</button>
       </div>
     </div>
     <div class="right-panel">
@@ -156,7 +169,6 @@
   </div>
 
   <script>
-
     let originalViewBox = null;
 
     function resetZoom() {
@@ -189,12 +201,16 @@
         }
 
         originalViewBox = svg.getAttribute('viewBox');
+
         svg.style.display = 'block';
         svg.style.width = '100%';
         svg.style.height = '100%';
         svg.style.margin = '0 auto';
 
         const regions = svg.querySelectorAll('path, polygon, rect');
+        const searchBox = document.getElementById('searchBox');
+        const regionNames = new Set();
+
         regions.forEach(region => {
           const originalColor = region.getAttribute('fill') || '#ccc';
           region.dataset.originalFill = originalColor;
@@ -213,15 +229,37 @@
 
           region.addEventListener('click', () => {
             const bbox = region.getBBox();
-            const scale = 1.4;
+            const scale = 1.5;
             const x = bbox.x + bbox.width / 2;
             const y = bbox.y + bbox.height / 2;
             svg.setAttribute('viewBox', `${x - bbox.width/scale} ${y - bbox.height/scale} ${bbox.width * scale} ${bbox.height * scale}`);
           });
+
+          const label = region.getAttribute('label') || region.getAttribute('inkscape:label') || region.getAttribute('data-label');
+          if (label) {
+            regionNames.add(label);
+          }
         });
+
+        if (searchBox && regionNames.size > 0) {
+          const datalistId = 'regionList';
+          let datalist = document.getElementById(datalistId);
+          if (!datalist) {
+            datalist = document.createElement('datalist');
+            datalist.id = datalistId;
+            document.body.appendChild(datalist);
+          }
+          datalist.innerHTML = '';
+          regionNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            datalist.appendChild(option);
+          });
+          searchBox.setAttribute('list', datalistId);
+        }
       }
     }
-  
+
     function lightenColor(hex, factor) {
       const num = parseInt(hex.replace('#',''), 16);
       let r = (num >> 16) + Math.round((255 - (num >> 16)) * factor);
@@ -235,6 +273,7 @@
   </script>
 </body>
 </html>
+
 
 
 
