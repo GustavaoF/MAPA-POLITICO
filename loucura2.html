@@ -149,8 +149,6 @@
         <input type="file" id="svgFile" accept=".svg">
       </div>
       <div class="map-frame" id="mapFrame">
-        <button id="zoomIn" style="position:absolute; bottom:60px; right:10px; z-index:10;">＋</button>
-        <button id="zoomOut" style="position:absolute; bottom:10px; right:10px; z-index:10;">－</button>
         <button id="resetZoom" style="position:absolute; top:10px; right:10px; z-index:10;">🔍</button>
         Mapa Eleitoral (vazio)
       </div>
@@ -190,19 +188,13 @@
         const svgY = (mouseY / svg.clientHeight) * currentViewBox[3] + currentViewBox[1];
 
         const scale = delta > 0 ? zoomFactor : 1 / zoomFactor;
-
         const newWidth = currentViewBox[2] * scale;
         const newHeight = currentViewBox[3] * scale;
-
-        const minZoom = 50;
-        const maxZoom = svg.viewBox.baseVal.width;
-        if (newWidth < minZoom || newWidth > maxZoom) return;
-
         const newX = svgX - ((svgX - currentViewBox[0]) * scale);
         const newY = svgY - ((svgY - currentViewBox[1]) * scale);
 
         currentViewBox = [newX, newY, newWidth, newHeight];
-        svg.setAttribute('viewBox', `${newX} ${newY} ${newWidth} ${newHeight}`);
+        svg.setAttribute("viewBox", `${newX} ${newY} ${newWidth} ${newHeight}`);
       }, { passive: false });
     }
 
@@ -232,7 +224,7 @@
     }
 
     function populateSearchList(svg) {
-      const inputSearch = document.querySelector('.controls input[type=\"text\"]');
+      const inputSearch = document.querySelector('.controls input[type="text"]');
       const oldDatalist = document.getElementById('municipiosList');
       if (oldDatalist) oldDatalist.remove();
 
@@ -261,7 +253,7 @@
       inputSearch.addEventListener('input', () => {
         const val = inputSearch.value.trim();
         if (val === '') return;
-        const selector = `[label=\"${val}\"], [inkscape\\:label=\"${val}\"]`;
+        const selector = `[label="${val}"], [inkscape\\:label="${val}"]`;
         const region = svg.querySelector(selector);
         if (region) zoomToRegion(svg, region);
       });
@@ -276,8 +268,6 @@
         const text = await file.text();
         const container = document.getElementById('mapFrame');
         container.innerHTML = text + `
-          <button id="zoomIn" style="position:absolute; bottom:60px; right:10px; z-index:10;">＋</button>
-          <button id="zoomOut" style="position:absolute; bottom:10px; right:10px; z-index:10;">－</button>
           <button id="resetZoom" style="position:absolute; top:10px; right:10px; z-index:10;">🔍</button>
         `;
 
@@ -300,8 +290,6 @@
             region.addEventListener('click', () => zoomToRegion(svg, region));
           });
 
-          document.getElementById('zoomIn').onclick = () => handleWheelZoom(svg, -100);
-          document.getElementById('zoomOut').onclick = () => handleWheelZoom(svg, 100);
           document.getElementById('resetZoom').onclick = () => {
             const bbox = svg.getBBox();
             currentViewBox = [0, 0, bbox.width, bbox.height];
@@ -339,6 +327,7 @@
   </script>
 </body>
 </html>
+
 
 
 
