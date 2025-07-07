@@ -189,7 +189,7 @@
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
 
-      const rows = [["cod_mun", "nome_mun", "nome_mun2", "cor"]];
+      const rows = [["cod_mun", "nome_mun", "cor"]];
       const elements = xmlDoc.querySelectorAll("[id]");
       elements.forEach(el => {
         const id = el.getAttribute("id") || "";
@@ -204,8 +204,6 @@
           }
         }
 
-        const label2 = label; // valor duplicado
-
         let fill = "";
         const styleAttr = el.getAttribute("style");
         if (styleAttr) {
@@ -219,7 +217,7 @@
           }
         }
 
-        rows.push([id, label, label2, fill]);
+        rows.push([id, label, fill]);
       });
 
       const csvContent = rows.map(row => row.join(",")).join("\n");
