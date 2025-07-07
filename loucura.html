@@ -56,6 +56,8 @@
     #download-links {
       margin-top: 10px;
       font-size: 14px;
+      min-height: 24px;
+      color: #004080;
     }
     #download-links a {
       margin-right: 15px;
@@ -164,7 +166,7 @@
   <div id="map-container">
     <p style="text-align:center; padding-top: 40%;">Nenhum mapa carregado</p>
   </div>
-  <div id="download-links"></div>
+  <div id="download-links">Nenhum mapa selecionado para download.</div>
 </section>
 
 <section id="lista-mapas"></section>
@@ -355,10 +357,9 @@
 
   function atualizarDownloadLinks(svgData, csvData) {
     if (!svgData || !csvData) {
-      downloadLinksDiv.innerHTML = '';
+      downloadLinksDiv.innerHTML = 'Nenhum mapa selecionado para download.';
       return;
     }
-    // Criar blobs para permitir download
     const blobSVG = new Blob([svgData], { type: 'image/svg+xml' });
     const urlSVG = URL.createObjectURL(blobSVG);
     const blobCSV = new Blob([csvData], { type: 'text/csv' });
@@ -368,9 +369,6 @@
       <a href="${urlSVG}" download="mapa.svg">Download SVG</a>
       <a href="${urlCSV}" download="dados.csv">Download CSV</a>
     `;
-
-    // Liberar URLs antigos quando possível (evitar vazamento de memória)
-    // Nota: URLs antigos não são armazenados; poderia melhorar guardando e revogando se quiser.
   }
 
   filtroAno.addEventListener('change', carregarMapaSelecionado);
@@ -422,4 +420,5 @@
 
 </body>
 </html>
+
 
