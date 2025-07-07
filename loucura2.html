@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -151,6 +151,7 @@
       <div class="map-frame" id="mapFrame">
         <button id="zoomIn" style="position:absolute; bottom:60px; right:10px; z-index:10;">＋</button>
         <button id="zoomOut" style="position:absolute; bottom:10px; right:10px; z-index:10;">－</button>
+        <button id="resetZoom" style="position:absolute; top:10px; right:10px; z-index:10;">🔍</button>
         Mapa Eleitoral (vazio)
       </div>
       <div class="hover-label" id="hoverLabel"></div>
@@ -195,42 +196,15 @@
 
         const minZoom = 50;
         const maxZoom = svg.viewBox.baseVal.width;
-
         if (newWidth < minZoom || newWidth > maxZoom) return;
 
         const newX = svgX - ((svgX - currentViewBox[0]) * scale);
         const newY = svgY - ((svgY - currentViewBox[1]) * scale);
 
         currentViewBox = [newX, newY, newWidth, newHeight];
-        svg.setAttribute("viewBox", `${newX} ${newY} ${newWidth} ${newHeight}`);
+        svg.setAttribute('viewBox', `${newX} ${newY} ${newWidth} ${newHeight}`);
       }, { passive: false });
     }
-
-    document.addEventListener('mousedown', (e) => {
-      const svg = document.querySelector('#mapFrame svg');
-      const mapFrame = document.getElementById('mapFrame');
-      if (!svg || !currentViewBox || !mapFrame.contains(e.target)) return;
-      isDragging = true;
-      dragStart = { x: e.clientX, y: e.clientY };
-      const [x, y, width, height] = currentViewBox;
-      viewBoxStart = { x, y, width, height };
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      const svg = document.querySelector('#mapFrame svg');
-      if (!svg || !isDragging || !currentViewBox) return;
-      const dx = ((e.clientX - dragStart.x) / svg.clientWidth) * currentViewBox[2];
-      const dy = ((e.clientY - dragStart.y) / svg.clientHeight) * currentViewBox[3];
-      svg.setAttribute('viewBox', `${viewBoxStart.x - dx} ${viewBoxStart.y - dy} ${viewBoxStart.width} ${viewBoxStart.height}`);
-    });
-
-    document.addEventListener('mouseup', () => {
-      const svg = document.querySelector('#mapFrame svg');
-      if (!svg || !isDragging) return;
-      const values = svg.getAttribute('viewBox').split(' ').map(Number);
-      currentViewBox = values;
-      isDragging = false;
-    });
 
     function zoomToRegion(svg, region) {
       const bbox = region.getBBox();
@@ -258,7 +232,7 @@
     }
 
     function populateSearchList(svg) {
-      const inputSearch = document.querySelector('.controls input[type="text"]');
+      const inputSearch = document.querySelector('.controls input[type=\"text\"]');
       const oldDatalist = document.getElementById('municipiosList');
       if (oldDatalist) oldDatalist.remove();
 
@@ -287,7 +261,7 @@
       inputSearch.addEventListener('input', () => {
         const val = inputSearch.value.trim();
         if (val === '') return;
-        const selector = `[label="${val}"], [inkscape\\:label="${val}"]`;
+        const selector = `[label=\"${val}\"], [inkscape\\:label=\"${val}\"]`;
         const region = svg.querySelector(selector);
         if (region) zoomToRegion(svg, region);
       });
@@ -301,7 +275,11 @@
 
         const text = await file.text();
         const container = document.getElementById('mapFrame');
-        container.innerHTML = text;
+        container.innerHTML = text + `
+          <button id="zoomIn" style="position:absolute; bottom:60px; right:10px; z-index:10;">＋</button>
+          <button id="zoomOut" style="position:absolute; bottom:10px; right:10px; z-index:10;">－</button>
+          <button id="resetZoom" style="position:absolute; top:10px; right:10px; z-index:10;">🔍</button>
+        `;
 
         const svg = container.querySelector('svg');
         if (svg) {
@@ -309,12 +287,9 @@
           svg.removeAttribute('height');
           svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-          const viewBox = svg.getAttribute('viewBox');
-          if (!viewBox) {
-            const bbox = svg.getBBox();
-            currentViewBox = [0, 0, bbox.width, bbox.height];
-            svg.setAttribute('viewBox', `${currentViewBox.join(' ')}`);
-          }
+          const bbox = svg.getBBox();
+          currentViewBox = [0, 0, bbox.width, bbox.height];
+          svg.setAttribute('viewBox', currentViewBox.join(' '));
 
           populateSearchList(svg);
           attachHoverListeners(svg);
@@ -324,12 +299,47 @@
             region.classList.add('map-region');
             region.addEventListener('click', () => zoomToRegion(svg, region));
           });
+
+          document.getElementById('zoomIn').onclick = () => handleWheelZoom(svg, -100);
+          document.getElementById('zoomOut').onclick = () => handleWheelZoom(svg, 100);
+          document.getElementById('resetZoom').onclick = () => {
+            const bbox = svg.getBBox();
+            currentViewBox = [0, 0, bbox.width, bbox.height];
+            svg.setAttribute('viewBox', `0 0 ${bbox.width} ${bbox.height}`);
+          };
         }
       });
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      const svg = document.querySelector('#mapFrame svg');
+      const mapFrame = document.getElementById('mapFrame');
+      if (!svg || !currentViewBox || !mapFrame.contains(e.target)) return;
+      isDragging = true;
+      dragStart = { x: e.clientX, y: e.clientY };
+      const [x, y, width, height] = currentViewBox;
+      viewBoxStart = { x, y, width, height };
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      const svg = document.querySelector('#mapFrame svg');
+      if (!svg || !isDragging || !currentViewBox) return;
+      const dx = ((e.clientX - dragStart.x) / svg.clientWidth) * currentViewBox[2];
+      const dy = ((e.clientY - dragStart.y) / svg.clientHeight) * currentViewBox[3];
+      svg.setAttribute('viewBox', `${viewBoxStart.x - dx} ${viewBoxStart.y - dy} ${viewBoxStart.width} ${viewBoxStart.height}`);
+    });
+
+    document.addEventListener('mouseup', () => {
+      const svg = document.querySelector('#mapFrame svg');
+      if (!svg || !isDragging) return;
+      const values = svg.getAttribute('viewBox').split(' ').map(Number);
+      currentViewBox = values;
+      isDragging = false;
     });
   </script>
 </body>
 </html>
+
 
 
 
