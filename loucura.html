@@ -1,198 +1,377 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Resultado Eleitoral - Acre</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Mapas Eleitorais</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
   <style>
-    * {
+    body {
+      font-family: 'Montserrat', sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: 'Montserrat', sans-serif;
-    }
-    body {
-      background-color: #f8f9fa;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: #f4f4f4;
     }
     header {
+      background-color: #004080;
+      color: white;
+      padding: 1rem;
       text-align: center;
-      margin-bottom: 20px;
     }
-    header h1 {
-      font-size: 28px;
-      color: #b30000;
-      font-weight: 600;
-    }
-    .container {
+    nav {
+      background: #ddd;
+      padding: 10px;
       display: flex;
-      gap: 50px;
-      width: 1250px;
-      justify-content: center;
+      justify-content: space-around;
     }
-    .left-panel {
-      width: 70%;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    .controls select, .controls input, .controls label {
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+    nav select {
+      padding: 5px;
       font-size: 14px;
     }
-    .map-frame {
-      width: 100%;
-      height: 700px;
-      background-color: #e9ecef;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      margin: 0 auto;
+    #upload-section {
+      padding: 20px;
+      background: white;
+      border-bottom: 1px solid #ccc;
     }
-    .map-frame svg {
+    #map-preview {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      background: white;
+    }
+    #map-container {
+      width: 90%;
+      max-width: 900px;
+      height: 600px;
+      border: 1px solid #999;
+      background: #fff;
+      overflow: hidden;
+    }
+    #map-container svg {
       width: 100%;
       height: 100%;
-      display: block;
-      padding: 15px;
-      transition: transform 0.3s ease;
+      object-fit: contain;
     }
-    .right-panel {
-      width: 30%;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .apuracao {
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 8px;
+    footer {
+      background: #004080;
+      color: white;
       text-align: center;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      padding: 1rem;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
     }
-    .apuracao h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #555;
-      margin-bottom: 8px;
+    #lista-mapas {
+      position: fixed;
+      bottom: 60px;
+      left: 10px;
+      right: 10px;
+      max-height: 200px;
+      background: white;
+      color: black;
+      padding: 1rem;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
     }
-    .apuracao .percentual {
-      background-color: #b30000;
-      color: #fff;
-      padding: 10px;
-      font-size: 20px;
-      border-radius: 4px;
-      font-weight: bold;
+    .mapa-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #ccc;
+      padding: 5px 0;
+      font-size: 14px;
     }
-    .candidatos {
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      flex-grow: 1;
-    }
-    .candidatos h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #333;
-    }
-    .map-region {
+    .mapa-item button {
+      margin-left: 10px;
       cursor: pointer;
-      transition: fill 0.2s ease;
+      background-color: #c00;
+      color: white;
+      border: none;
+      padding: 2px 8px;
+      border-radius: 4px;
     }
-    .map-region:hover {
-      fill: #f0f0f0 !important;
+    .mapa-item button:hover {
+      background-color: #900;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Análise Eleitoral Brasil</h1>
-  </header>
 
-  <div class="container">
-    <div class="left-panel">
-      <div class="controls">
-        <select>
-          <option selected>Estado</option>
-          <option>Acre</option>
-        </select>
-        <input type="text" placeholder="Busque pelo município">
-        <select>
-          <option selected>1º Turno</option>
-        </select>
-        <input type="file" id="svgFile" accept=".svg" onchange="loadSvg()">
-      </div>
-      <div class="map-frame" id="mapFrame">
-        Mapa Eleitoral (vazio)
-      </div>
-    </div>
-    <div class="right-panel">
-      <div class="apuracao">
-        <h2>Seções apuradas</h2>
-        <div class="percentual">100,00%</div>
-      </div>
-      <div class="candidatos">
-        <h3>CANDIDATOS</h3>
-        <!-- Espaço reservado para candidatos -->
-      </div>
-    </div>
+<header>
+  <h1>Mapas Eleitorais do Brasil</h1>
+  <p>Carregue, visualize e compartilhe resultados de eleições por localidade</p>
+</header>
+
+<nav>
+  <label>Ano:
+    <select id="filtro-ano">
+      <option value="">--</option>
+    </select>
+  </label>
+
+  <label>Turno:
+    <select id="filtro-turno">
+      <option value="">--</option>
+    </select>
+  </label>
+
+  <label>Estado:
+    <select id="filtro-estado">
+      <option value="">--</option>
+    </select>
+  </label>
+
+  <label>Município:
+    <select id="filtro-municipio">
+      <option value="">--</option>
+    </select>
+  </label>
+</nav>
+
+<section id="upload-section">
+  <h2>Carregar Mapa Eleitoral (.SVG e .CSV)</h2>
+  <input type="file" id="file-input" accept=".svg" /><br /><br />
+  <input type="file" id="csv-input" accept=".csv" /><br /><br />
+  <label>Ano: <input type="text" id="input-ano" /></label>
+  <label>Turno: <input type="text" id="input-turno" /></label>
+  <label>Estado: <input type="text" id="input-estado" /></label>
+  <label>Município: <input type="text" id="input-municipio" /></label>
+  <button id="save-map">Salvar Mapa</button>
+  <button id="delete-map">Apagar Mapa</button>
+</section>
+
+<section id="map-preview">
+  <div id="map-container">
+    <p style="text-align:center; padding-top: 40%;">Nenhum mapa carregado</p>
   </div>
+</section>
 
-  <script>
-    async function loadSvg() {
-      const input = document.getElementById('svgFile');
-      const file = input.files[0];
-      if (!file) return;
+<section id="lista-mapas"></section>
 
-      const text = await file.text();
-      const container = document.getElementById('mapFrame');
-      container.innerHTML = text;
+<footer>
+  &copy; 2025 - Plataforma de Mapas Eleitorais
+  <button id="btn-todos-mapas">Todos os Mapas</button>
+</footer>
 
-      const svg = container.querySelector('svg');
-      if (svg) {
-        svg.removeAttribute('width');
-        svg.removeAttribute('height');
-        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+<script>
+  const fileInput = document.getElementById('file-input');
+  const csvInput = document.getElementById('csv-input');
+  const mapContainer = document.getElementById('map-container');
+  const saveButton = document.getElementById('save-map');
+  const deleteButton = document.getElementById('delete-map');
+  const btnTodosMapas = document.getElementById('btn-todos-mapas');
 
-        const viewBox = svg.getAttribute('viewBox');
-        if (!viewBox) {
-          const bbox = svg.getBBox();
-          svg.setAttribute('viewBox', `0 0 ${bbox.width} ${bbox.height}`);
-        }
+  const inputAno = document.getElementById('input-ano');
+  const inputTurno = document.getElementById('input-turno');
+  const inputEstado = document.getElementById('input-estado');
+  const inputMunicipio = document.getElementById('input-municipio');
 
-        svg.style.display = 'block';
-        svg.style.width = '100%';
-        svg.style.height = '100%';
-        svg.style.margin = '0 auto';
+  const filtroAno = document.getElementById('filtro-ano');
+  const filtroTurno = document.getElementById('filtro-turno');
+  const filtroEstado = document.getElementById('filtro-estado');
+  const filtroMunicipio = document.getElementById('filtro-municipio');
 
-        const regions = svg.querySelectorAll('path, polygon, rect');
-        regions.forEach(region => {
-          region.classList.add('map-region');
-          region.addEventListener('click', () => {
-            const bbox = region.getBBox();
-            const scale = 2;
-            const x = bbox.x + bbox.width / 2;
-            const y = bbox.y + bbox.height / 2;
-            svg.setAttribute('viewBox', `${x - bbox.width/scale} ${y - bbox.height/scale} ${bbox.width * 2} ${bbox.height * 2}`);
-          });
-        });
-      }
+  const listaMapasSection = document.getElementById('lista-mapas');
+
+  const mapaStorageKey = 'mapasEleitorais';
+  let svgContent = '';
+  let csvContent = '';
+  let localMapas = JSON.parse(localStorage.getItem(mapaStorageKey) || '[]');
+
+  fileInput.addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.endsWith('.svg')) {
+      alert("Por favor, envie um arquivo .SVG válido.");
+      return;
     }
-  </script>
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      svgContent = e.target.result;
+      exibirSVG(svgContent);
+    };
+    reader.readAsText(file);
+  });
+
+  csvInput.addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.endsWith('.csv')) {
+      alert("Por favor, envie um arquivo .CSV válido.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      csvContent = e.target.result;
+      console.log("CSV carregado:", csvContent);
+    };
+    reader.readAsText(file);
+  });
+
+  function exibirSVG(svg) {
+    mapContainer.innerHTML = svg;
+    const svgEl = mapContainer.querySelector('svg');
+    if (svgEl) {
+      svgEl.removeAttribute('width');
+      svgEl.removeAttribute('height');
+      svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      svgEl.setAttribute('viewBox', svgEl.getAttribute('viewBox') || '0 0 1000 1000');
+    }
+  }
+
+  saveButton.addEventListener('click', () => {
+    if (!svgContent) {
+      alert("Nenhum mapa carregado.");
+      return;
+    }
+    const ano = inputAno.value.trim();
+    const turno = inputTurno.value.trim();
+    const estado = inputEstado.value.trim();
+    const municipio = inputMunicipio.value.trim();
+
+    if (!ano || !turno || !estado || !municipio) {
+      alert("Preencha todas as informações antes de salvar.");
+      return;
+    }
+
+    const mapaData = { ano, turno, estado, municipio, svg: svgContent, csv: csvContent };
+    localMapas.push(mapaData);
+    localStorage.setItem(mapaStorageKey, JSON.stringify(localMapas));
+    alert("Mapa salvo localmente!");
+    atualizarFiltros();
+  });
+
+  deleteButton.addEventListener('click', () => {
+    const ano = inputAno.value.trim();
+    const turno = inputTurno.value.trim();
+    const estado = inputEstado.value.trim();
+    const municipio = inputMunicipio.value.trim();
+
+    if (!ano || !turno || !estado || !municipio) {
+      alert("Preencha todas as informações para excluir um mapa.");
+      return;
+    }
+
+    const index = localMapas.findIndex(m =>
+      m.ano === ano &&
+      m.turno === turno &&
+      m.estado === estado &&
+      m.municipio === municipio
+    );
+
+    if (index !== -1) {
+      localMapas.splice(index, 1);
+      localStorage.setItem(mapaStorageKey, JSON.stringify(localMapas));
+      alert("Mapa removido com sucesso.");
+      mapContainer.innerHTML = '<p style="text-align:center; padding-top: 40%;">Nenhum mapa carregado</p>';
+      atualizarFiltros();
+    } else {
+      alert("Nenhum mapa encontrado com essas especificações.");
+    }
+  });
+
+  function carregarTodosMapas() {
+    try {
+      localMapas = JSON.parse(localStorage.getItem(mapaStorageKey) || '[]');
+      atualizarFiltros();
+    } catch (e) {
+      console.error("Erro ao carregar mapas do armazenamento local.", e);
+    }
+  }
+
+  function atualizarFiltros() {
+    const anos = new Set();
+    const turnos = new Set();
+    const estados = new Set();
+    const municipios = new Set();
+
+    localMapas.forEach(mapa => {
+      anos.add(mapa.ano);
+      turnos.add(mapa.turno);
+      estados.add(mapa.estado);
+      municipios.add(mapa.municipio);
+    });
+
+    atualizarSelect(filtroAno, anos);
+    atualizarSelect(filtroTurno, turnos);
+    atualizarSelect(filtroEstado, estados);
+    atualizarSelect(filtroMunicipio, municipios);
+  }
+
+  function atualizarSelect(select, values) {
+    select.innerHTML = '<option value="">--</option>';
+    [...values].sort().forEach(value => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+    });
+  }
+
+  function carregarMapaSelecionado() {
+    const mapa = localMapas.find(m =>
+      m.ano === filtroAno.value &&
+      m.turno === filtroTurno.value &&
+      m.estado === filtroEstado.value &&
+      m.municipio === filtroMunicipio.value
+    );
+
+    if (mapa) {
+      exibirSVG(mapa.svg);
+      console.log("Dados CSV:", mapa.csv);
+    } else {
+      mapContainer.innerHTML = '<p style="text-align:center; padding-top: 40%;">Nenhum mapa encontrado</p>';
+    }
+  }
+
+  filtroAno.addEventListener('change', carregarMapaSelecionado);
+  filtroTurno.addEventListener('change', carregarMapaSelecionado);
+  filtroEstado.addEventListener('change', carregarMapaSelecionado);
+  filtroMunicipio.addEventListener('change', carregarMapaSelecionado);
+
+  function mostrarTodosMapas() {
+    if(localMapas.length === 0) {
+      listaMapasSection.style.display = 'block';
+      listaMapasSection.innerHTML = '<h3>Todos os Mapas Registrados</h3><p>Nenhum mapa cadastrado.</p>';
+      return;
+    }
+    listaMapasSection.style.display = 'block';
+    listaMapasSection.innerHTML = '<h3>Todos os Mapas Registrados</h3>';
+
+    localMapas.forEach((mapa, index) => {
+      const div = document.createElement('div');
+      div.className = 'mapa-item';
+      div.innerHTML = `
+        <span>${mapa.ano} - ${mapa.turno} - ${mapa.estado} - ${mapa.municipio}</span>
+        <button onclick="excluirMapaPorIndice(${index})">Excluir</button>
+      `;
+      listaMapasSection.appendChild(div);
+    });
+  }
+
+  function excluirMapaPorIndice(index) {
+    if (confirm('Tem certeza que deseja excluir este mapa?')) {
+      localMapas.splice(index, 1);
+      localStorage.setItem(mapaStorageKey, JSON.stringify(localMapas));
+      mostrarTodosMapas();
+      atualizarFiltros();
+      mapContainer.innerHTML = '<p style="text-align:center; padding-top: 40%;">Nenhum mapa carregado</p>';
+    }
+  }
+
+  btnTodosMapas.addEventListener('click', () => {
+    if (listaMapasSection.style.display === 'block') {
+      listaMapasSection.style.display = 'none';
+    } else {
+      mostrarTodosMapas();
+    }
+  });
+
+  carregarTodosMapas();
+</script>
+
 </body>
 </html>
