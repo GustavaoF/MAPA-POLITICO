@@ -149,7 +149,7 @@
       const lines = csvText.split(/\r?\n/);
       const map = {};
       for (let i = 1; i < lines.length; i++) {
-        const [cod_mun, nome_mun, cor] = lines[i].split(',');
+        const [cod_mun, nome_mun, nome_mun2, cor] = lines[i].split(',');
         if (cod_mun && cor) map[cod_mun.trim()] = cor.trim();
       }
 
