@@ -149,7 +149,7 @@
       const lines = csvText.split(/\r?\n/);
       const map = {};
       for (let i = 1; i < lines.length; i++) {
-        const [cod_mun, nome_mun, nome_mun2, cor] = lines[i].split(',');
+        const [cod_mun, nome_mun, cor] = lines[i].split(',');
         if (cod_mun && cor) map[cod_mun.trim()] = cor.trim();
       }
 
@@ -189,10 +189,16 @@
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
 
-      const rows = [["cod_mun", "nome_mun", "nome_mun2", "cor"]];
+      const rows = [["cod_mun", "tit_mun", "cor", "nome_mun", "nome_mun2"]];
       const elements = xmlDoc.querySelectorAll("[id]");
       elements.forEach(el => {
         const id = el.getAttribute("id") || "";
+
+        let title = "";
+        const titleEl = el.querySelector("title");
+        if (titleEl) {
+          title = titleEl.textContent.trim();
+        }
 
         let label = el.getAttribute("label") || "";
         if (!label) {
@@ -203,8 +209,6 @@
             }
           }
         }
-
-        const nome_mun2 = ""; // coluna auxiliar vazia
 
         let fill = "";
         const styleAttr = el.getAttribute("style");
@@ -219,7 +223,7 @@
           }
         }
 
-        rows.push([id, label, fill]);
+        rows.push([id, title, fill, label, ""]);
       });
 
       const csvContent = rows.map(row => row.join(",")).join("\n");
