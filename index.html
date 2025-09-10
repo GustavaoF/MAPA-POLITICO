@@ -150,7 +150,9 @@
       const map = {};
       for (let i = 1; i < lines.length; i++) {
         const [cod_mun, nome_mun, cor] = lines[i].split(',');
-        if (cod_mun && cor) map[cod_mun.trim()] = cor.trim();
+        if (cod_mun) {
+          map[cod_mun.trim()] = { nome: nome_mun ? nome_mun.trim() : "", cor: cor ? cor.trim() : "" };
+        }
       }
 
       const elements = xmlDoc.querySelectorAll("[id]");
@@ -159,8 +161,16 @@
         if (map[id]) {
           let style = el.getAttribute("style") || "";
           let styles = Object.fromEntries(style.split(';').map(s => s.split(':')).filter(p => p.length === 2));
-          styles.fill = map[id];
+          if (map[id].cor) styles.fill = map[id].cor;
           el.setAttribute("style", Object.entries(styles).map(([k, v]) => `${k}:${v}`).join(';'));
+
+          // Atualizar ou criar <title>
+          let titleEl = el.querySelector("title");
+          if (!titleEl) {
+            titleEl = xmlDoc.createElement("title");
+            el.insertBefore(titleEl, el.firstChild);
+          }
+          titleEl.textContent = map[id].nome;
         }
       });
 
@@ -238,8 +248,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
