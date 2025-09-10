@@ -242,8 +242,30 @@
           }
         }
 
+        // Atualizar ou criar <title> no SVG exportado para ter o mesmo valor de nome_mun
+        if (label) {
+          let titleElUpdate = el.querySelector("title");
+          if (!titleElUpdate) {
+            titleElUpdate = xmlDoc.createElement("title");
+            el.insertBefore(titleElUpdate, el.firstChild);
+          }
+          titleElUpdate.textContent = label;
+          el.setAttribute("title", label);
+        }
+
         rows.push([id, title, fill, label, ""]);
       });
+
+      const serializer = new XMLSerializer();
+      const editedSvg = serializer.serializeToString(xmlDoc);
+      const blobSvg = new Blob([editedSvg], { type: "image/svg+xml" });
+      const urlSvg = URL.createObjectURL(blobSvg);
+
+      const linkSvg = document.createElement("a");
+      linkSvg.href = urlSvg;
+      linkSvg.download = "mapa_extraido.svg";
+      linkSvg.textContent = "Baixar Mapa Extraído";
+      document.getElementById("extractedSvgPreview").appendChild(linkSvg);
 
       const csvContent = rows.map(row => row.join(",")).join("\n");
       const blob = new Blob([csvContent], { type: "text/csv" });
