@@ -85,7 +85,7 @@
 
   <div id="originalSvgPreview"></div>
 
-  <p>Etapa II - Faça o upload de um arquivo <strong>.csv</strong> com colunas: <code>cod_mun,nome_mun,cor</code>:</p>
+  <p>Etapa II - Faça o upload de um arquivo <strong>.csv</strong> com colunas: <code>cod_mun,tit_mun,cor,nome_mun,nome_mun2</code>:</p>
   <input type="file" id="csvFile" accept=".csv">
 
   <br>
@@ -149,8 +149,15 @@
       const lines = csvText.split(/\r?\n/);
       const map = {};
       for (let i = 1; i < lines.length; i++) {
-        const [cod_mun, nome_mun, nome_mun2, cor] = lines[i].split(',');
-        if (cod_mun && cor) map[cod_mun.trim()] = cor.trim();
+        const [cod_mun, tit_mun, cor, nome_mun, nome_mun2] = lines[i].split(',');
+        if (cod_mun) {
+          map[cod_mun.trim()] = {
+            titulo: tit_mun ? tit_mun.trim() : "",
+            cor: cor ? cor.trim() : "",
+            nome: nome_mun ? nome_mun.trim() : "",
+            nome2: nome_mun2 ? nome_mun2.trim() : ""
+          };
+        }
       }
 
       const elements = xmlDoc.querySelectorAll("[id]");
@@ -159,8 +166,17 @@
         if (map[id]) {
           let style = el.getAttribute("style") || "";
           let styles = Object.fromEntries(style.split(';').map(s => s.split(':')).filter(p => p.length === 2));
-          styles.fill = map[id];
+          if (map[id].cor) styles.fill = map[id].cor;
           el.setAttribute("style", Object.entries(styles).map(([k, v]) => `${k}:${v}`).join(';'));
+
+          // Atualizar ou criar <title> com nome_mun (label)
+          let titleEl = el.querySelector("title");
+          if (!titleEl) {
+            titleEl = xmlDoc.createElement("title");
+            el.insertBefore(titleEl, el.firstChild);
+          }
+          titleEl.textContent = map[id].nome;
+          el.setAttribute("title", map[id].nome);
         }
       });
 
@@ -189,10 +205,19 @@
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(svgText, "image/svg+xml");
 
-      const rows = [["cod_mun", "nome_mun", "nome_mun2", "cor"]];
+      const rows = [["cod_mun", "tit_mun", "cor", "nome_mun", "nome_mun2"]];
       const elements = xmlDoc.querySelectorAll("[id]");
       elements.forEach(el => {
         const id = el.getAttribute("id") || "";
+
+        let title = "";
+        const titleEl = el.querySelector("title");
+        if (titleEl) {
+          title = titleEl.textContent.trim();
+        }
+        if (!title && el.hasAttribute("title")) {
+          title = el.getAttribute("title").trim();
+        }
 
         let label = el.getAttribute("label") || "";
         if (!label) {
@@ -203,8 +228,6 @@
             }
           }
         }
-
-        const nome_mun2 = ""; // coluna auxiliar vazia
 
         let fill = "";
         const styleAttr = el.getAttribute("style");
@@ -219,7 +242,7 @@
           }
         }
 
-        rows.push([id, label, fill]);
+        rows.push([id, title, fill, label, ""]);
       });
 
       const csvContent = rows.map(row => row.join(",")).join("\n");
@@ -234,8 +257,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
