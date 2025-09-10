@@ -176,6 +176,7 @@
             el.insertBefore(titleEl, el.firstChild);
           }
           titleEl.textContent = map[id].titulo;
+          el.setAttribute("title", map[id].titulo);
         }
       });
 
@@ -213,6 +214,9 @@
         const titleEl = el.querySelector("title");
         if (titleEl) {
           title = titleEl.textContent.trim();
+        }
+        if (!title && el.hasAttribute("title")) {
+          title = el.getAttribute("title").trim();
         }
 
         let label = el.getAttribute("label") || "";
